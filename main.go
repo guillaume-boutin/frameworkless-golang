@@ -4,30 +4,28 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
-	"github.com/guillaume-boutin/frameworkless-golang/bootstrap"
-	"github.com/joho/godotenv"
+	routing "github.com/go-ozzo/ozzo-routing"
+	"github.com/guillaume-boutin/frameworkless-golang/app/controllers"
+	"github.com/guillaume-boutin/frameworkless-golang/middleware"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+func handler(c *routing.Context) error {
+	env := (c.Get("Env")).(map[string]string)
+	fmt.Println(env["APP_NAME"])
+
+	fmt.Println(c.Query("name"))
+
+	return c.Write("Hello world!")
 }
 
 func main() {
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	router := routing.New()
+	router.Use(middleware.Env)
 
-	APP_NAME := os.Getenv("APP_NAME")
-	fmt.Println(APP_NAME)
+	router.Get("/", controllers.HomeController.Index)
 
-	ctn := bootstrap.Container()
-	test := ctn.Get("test")
-	fmt.Println(test)
-
-	http.HandleFunc("/", handler)
+	http.Handle("/", router)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
