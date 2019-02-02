@@ -6,8 +6,7 @@ import (
 	"net/http"
 
 	routing "github.com/go-ozzo/ozzo-routing"
-	"github.com/guillaume-boutin/frameworkless-golang/app/controllers"
-	"github.com/guillaume-boutin/frameworkless-golang/middleware"
+	"github.com/guillaume-boutin/frameworkless-golang/routes"
 )
 
 func handler(c *routing.Context) error {
@@ -22,9 +21,7 @@ func handler(c *routing.Context) error {
 func main() {
 
 	router := routing.New()
-	router.Use(middleware.Env)
-
-	router.Get("/", controllers.HomeController.Index)
+	routes.Register(router)
 
 	http.Handle("/", router)
 	log.Fatal(http.ListenAndServe(":8080", nil))
