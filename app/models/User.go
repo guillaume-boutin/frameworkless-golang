@@ -11,6 +11,8 @@ type User struct {
 	HashPassword string `gorm:"size:255;NOT NULL"`
 }
 
+type Users []User
+
 func (u User) Resource() resources.UserResource {
 	return resources.UserResource{
 		ID:        u.ID,
@@ -19,4 +21,14 @@ func (u User) Resource() resources.UserResource {
 		UpdatedAt: u.UpdatedAt,
 		DeletedAt: u.DeletedAt,
 	}
+}
+
+func (users Users) Resource() []resources.UserResource {
+	collection := []resources.UserResource{}
+
+	for _, user := range users {
+		collection = append(collection, user.Resource())
+	}
+
+	return collection
 }
