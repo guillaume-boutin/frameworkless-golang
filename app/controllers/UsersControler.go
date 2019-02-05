@@ -1,27 +1,19 @@
 package controllers
 
 import (
-	"encoding/json"
-
 	routing "github.com/go-ozzo/ozzo-routing"
-	"github.com/guillaume-boutin/frameworkless-golang/app/models"
+	actions "github.com/guillaume-boutin/frameworkless-golang/app/actions/userActions"
 	"github.com/guillaume-boutin/frameworkless-golang/lib"
 )
 
-type usersController struct{}
+type usersController struct {
+	lib.Controller
+}
 
 var UsersController = usersController{}
 
-func (hc usersController) Index(c *routing.Context) error {
-	db, _ := lib.Db()
-	defer db.Close()
+func (ctrl usersController) Index(c *routing.Context) error {
+	body := actions.UserIndex.Run()
 
-	users := models.Users{}
-	db.Find(&users)
-
-	collection := users.Resource()
-
-	res, _ := json.Marshal(&collection)
-
-	return c.Write(res)
+	return ctrl.Respond(c).StatusCode(200).Json(&body)
 }
